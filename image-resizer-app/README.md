@@ -22,7 +22,7 @@ The Image Resizer App is a desktop application built using Python, PyQt5 for the
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/image-resizer-app.git
+    git clone https://github.com/harmonipsllc/image-resizer-app.git
     cd image-resizer-app
     ```
 
@@ -50,7 +50,7 @@ The Image Resizer App is a desktop application built using Python, PyQt5 for the
 
 ## Code Structure
 
-- [main.py](http://_vscodecontentref_/0): The main application file that sets up the GUI and handles drag-and-drop events.
+- [main.py]: The main application file that sets up the GUI and handles drag-and-drop events.
 - `src/controllers/main_controller.py`: The controller that handles image processing and saving.
 - `src/utils/file_utils.py`: Utility functions for file operations.
 
@@ -70,4 +70,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## Contact
 
-For any questions or inquiries, please contact [yourname@example.com](mailto:yourname@example.com).
+For any questions or inquiries, please contact [arnaudjeanvoine@gmail.com].
