@@ -69,9 +69,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
 ## Contact
+For any questions or inquiries, please contact [arnaudjeanvoine@gmail.com].
 
-<<<<<<< HEAD
-For any questions or inquiries, please contact [arnaudjeanvoine@gmail.com].
-=======
-For any questions or inquiries, please contact [arnaudjeanvoine@gmail.com].
->>>>>>> 192f00e80a40e30683220beec8a703d6d2e7199f
