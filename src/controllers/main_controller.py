@@ -73,6 +73,7 @@ class MainController:
                 resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
             else:
                 resized_image = image
+                new_height = h  # Ensure new_height is defined
 
             if new_height > height:
                 # Crop the height from the center

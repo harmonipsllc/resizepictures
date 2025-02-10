@@ -22,7 +22,7 @@ The Image Resizer App is a desktop application built using Python, PyQt5 for the
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/harmonipsllc/image-resizer-app.git
+    git clone https://github.com/harmonipsllc/resizerpictures.git
     cd image-resizer-app
     ```
 
@@ -70,4 +70,8 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## Contact
 
+<<<<<<< HEAD
 For any questions or inquiries, please contact [arnaudjeanvoine@gmail.com].
+=======
+For any questions or inquiries, please contact [arnaudjeanvoine@gmail.com].
+>>>>>>> 192f00e80a40e30683220beec8a703d6d2e7199f
