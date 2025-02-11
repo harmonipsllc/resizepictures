@@ -1,6 +1,6 @@
 import os
 import cv2
-from PyQt5.QtWidgets import QInputDialog, QFileDialog
+from PyQt5.QtWidgets import QInputDialog, QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 
@@ -28,6 +28,7 @@ class MainController:
         self.main_app.progress_bar.setMaximum(len(self.image_files))
 
         width, height = self.get_resolution()
+        crop = self.ask_crop_or_resize()
 
         if not append:
             self.resized_images = []
@@ -35,7 +36,7 @@ class MainController:
         for i, image_file in enumerate(new_image_files):
             image = cv2.imread(image_file)
             if image is not None:
-                resized_image = self.process_image(image, width, height)
+                resized_image = self.process_image(image, width, height, crop)
                 self.resized_images.append(resized_image)
                 self.save_image(resized_image, image_file)
             self.main_app.progress_bar.setValue(i + 1)
@@ -52,38 +53,56 @@ class MainController:
             return None, None
         return width, height
 
-    def process_image(self, image, width, height):
+    def ask_crop_or_resize(self):
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle("Crop or Resize")
+        msg_box.setText("Do you want to crop the images or just resize them?")
+        crop_button = msg_box.addButton("Crop", QMessageBox.ActionRole)
+        resize_button = msg_box.addButton("Resize", QMessageBox.ActionRole)
+        msg_box.exec_()
+
+        if msg_box.clickedButton() == crop_button:
+            return True
+        else:
+            return False
+
+    def process_image(self, image, width, height, crop):
         h, w = image.shape[:2]
 
-        if h > w:
-            # Resize the image to the desired width while maintaining aspect ratio
-            new_width = width
-            new_height = int(h * (width / w))
-            resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
-
-            # Crop the height from the center
-            center_y = new_height // 2
-            half_height = height // 2
-            cropped_image = resized_image[center_y - half_height:center_y + half_height, :]
-        else:
-            if w > width:
+        if crop:
+            if h > w:
                 # Resize the image to the desired width while maintaining aspect ratio
                 new_width = width
                 new_height = int(h * (width / w))
                 resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
-            else:
-                resized_image = image
-                new_height = h  # Ensure new_height is defined
 
-            if new_height > height:
                 # Crop the height from the center
                 center_y = new_height // 2
                 half_height = height // 2
                 cropped_image = resized_image[center_y - half_height:center_y + half_height, :]
             else:
-                cropped_image = resized_image
+                if w > width:
+                    # Resize the image to the desired width while maintaining aspect ratio
+                    new_width = width
+                    new_height = int(h * (width / w))
+                    resized_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+                else:
+                    resized_image = image
+                    new_height = h  # Ensure new_height is defined
 
-        return cropped_image
+                if new_height > height:
+                    # Crop the height from the center
+                    center_y = new_height // 2
+                    half_height = height // 2
+                    cropped_image = resized_image[center_y - half_height:center_y + half_height, :]
+                else:
+                    cropped_image = resized_image
+
+            return cropped_image
+        else:
+            # Just resize the image to the desired resolution
+            resized_image = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+            return resized_image
 
     def save_image(self, image, original_path):
         base, ext = os.path.splitext(original_path)
