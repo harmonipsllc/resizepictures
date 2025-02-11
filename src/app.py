@@ -42,7 +42,6 @@ app.layout = html.Div([
     html.Div(id='output-image-upload'),
     dcc.Input(id='input-width', type='number', placeholder='Width (default: 1920)', value=1920),
     dcc.Input(id='input-height', type='number', placeholder='Height (default: 1080)', value=1080),
-    html.Button('Resize', id='resize-button', n_clicks=0),
     dcc.RadioItems(
         id='crop-or-resize',
         options=[
@@ -52,7 +51,9 @@ app.layout = html.Div([
         value='resize',
         labelStyle={'display': 'inline-block'}
     ),
-    html.Button('Save', id='save-button', n_clicks=0),
+    html.Div(id='file-loaded-message', style={'marginTop': '10px'}),
+    html.Button('Resize', id='resize-button', n_clicks=0, style={'width': '100%', 'marginTop': '10px'}),
+    html.Button('Save', id='save-button', n_clicks=0, style={'width': '100%', 'marginTop': '10px'}),
     html.Div(id='output-images'),
     html.Div(id='file-list', style={'marginTop': '20px'}),
     dcc.Download(id="download-zip")
@@ -67,8 +68,19 @@ def parse_contents(contents, filename):
     return image, filename
 
 @app.callback(
-    Output('output-images', 'children'),
+    Output('file-loaded-message', 'children'),
     Output('file-list', 'children'),
+    Input('upload-image', 'contents'),
+    State('upload-image', 'filename')
+)
+def update_file_list(contents, filenames):
+    if contents is not None:
+        file_list = [html.Div(filename) for filename in filenames]
+        return html.Div("Files loaded successfully. You can now click on the Resize button."), file_list
+    return html.Div(), []
+
+@app.callback(
+    Output('output-images', 'children'),
     Input('resize-button', 'n_clicks'),
     State('upload-image', 'contents'),
     State('upload-image', 'filename'),
@@ -83,7 +95,6 @@ def resize_images(n_clicks, contents, filenames, width, height, crop_or_resize):
             images = [parse_contents(c, f) for c, f in zip(contents, filenames)]
             crop = (crop_or_resize == 'crop')
             output_images = []
-            file_list = []
 
             for image, filename in images:
                 print(f"Processing image: {filename}")
@@ -91,21 +102,21 @@ def resize_images(n_clicks, contents, filenames, width, height, crop_or_resize):
                 _, buffer = cv2.imencode('.png', resized_image)
                 encoded_resized_image = base64.b64encode(buffer).decode('utf-8')
                 encoded_original_image = base64.b64encode(cv2.imencode('.png', image)[1]).decode('utf-8')
+                resized_filename = os.path.splitext(filename)[0] + '_resized.png'
                 output_images.append(html.Div([
                     html.H5(filename),
                     html.Div([
-                        html.Img(src='data:image/png;base64,{}'.format(encoded_original_image), style={'marginRight': '10px'}),
+                        html.Img(src='data:image/png;base64,{}'.format(encoded_original_image), style={'marginBottom': '10px'}),
                         html.Img(src='data:image/png;base64,{}'.format(encoded_resized_image))
-                    ], style={'display': 'flex'})
+                    ], style={'display': 'block'})
                 ]))
-                file_list.append(html.Div(filename))
-                resized_images_store[filename] = buffer.tobytes()
+                resized_images_store[resized_filename] = buffer.tobytes()
 
-            return output_images, file_list
+            return output_images
         except Exception as e:
             print(f"Error processing images: {e}")
-            return [html.Div(f"Error processing images: {e}")], []
-    return [], []
+            return [html.Div(f"Error processing images: {e}")]
+    return []
 
 @app.callback(
     Output("download-zip", "data"),
